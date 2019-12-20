@@ -26,7 +26,9 @@ IAM_POL_NAME="testcase"
 RDS_SNAP_ID="testcasesnap"
 COSRFILE="file://cors.json"
 POLICYFILE="file://policytestcasepol.json"
+NGINXPOLFILE="file://nginxpol.json"
 ASEC_GROUP="testsecgroup"
+ADMINHOMEIP="8.8.8.8/32"
 #******************************************************************************
 #    installing dependcies
 #******************************************************************************
@@ -70,7 +72,7 @@ echo "  VPC ID '$VPC_ID' CREATED in '$AWS_REGION' region."
 # Add Name tag to VPC
 aws ec2 create-tags \
   --resources $VPC_ID \
-  --tags "Key=Name,Value=test" \
+  --tags "Key=Network,Value=test" \
   --region $AWS_REGION
 echo "  VPC ID '$VPC_ID' NAMED as 'test'."
 
@@ -302,3 +304,23 @@ aws ec2 create-security-group \
 --description testsecgroup \
 --group-name $ASEC_GROUP \
 --vpc-id $VPC_ID
+#policyadd
+aws ec2 describe-security-groups --group-names $ASEC_GROUP
+#allow 22
+aws ec2 authorize-security-group-ingress \
+  --group-name $ASEC_GROUP \
+  --protocol tcp \
+  --port 22 \
+  -cidr $ADMINHOMEIP
+#allow nginx from wan
+aws ec2 authorize-security-group-ingress \
+  --group-name $ASEC_GROUP \
+  --protocol tcp \
+  --port 80 \
+  -cidr 0.0.0.0/0
+
+#CREATE EC2 image ubuntu-nginx
+#create and tag instance
+#aws ec2 run-instances --image-id ami-059d836af932792c3 --count 1 --instance-type t3.micro --key-name aws --subnet-id $SUBNET_PUBLIC_ID
+#get instances id
+#INSTANCE_AWS=$(aws ec2 describe-instances | jq -r ".Reservations[0].Instances[0].InstanceId")
