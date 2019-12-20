@@ -26,6 +26,7 @@ IAM_POL_NAME="testcase"
 RDS_SNAP_ID="testcasesnap"
 COSRFILE="file://cors.json"
 POLICYFILE="file://policytestcasepol.json"
+ASEC_GROUP="testsecgroup"
 #******************************************************************************
 #    installing dependcies
 #******************************************************************************
@@ -266,7 +267,7 @@ aws rds create-db-instance \
 echo "RDS database with $RDS_DB_ID created"
 #
 #******************************************************************************
-#    CreSnapshoting-cloning-restoring created RDS database instance
+#    Snapshoting-cloning-restoring created RDS database instance
 #******************************************************************************
 aws rds create-db-snapshot \
   --db-instance-identifier $RDS_DB_ID \
@@ -293,3 +294,11 @@ aws rds delete-db-instance \
   --db-instance-identifier $RDS_DB_ID \
   --db-instance-identifier $RDS_DB_ID_CLONE
 echo "seems all have been marked 4 deletion. please run 'aws rds describe-db-instances' in 10 mins 2 ensure"
+#
+#******************************************************************************
+#    Amazon security group
+#******************************************************************************
+aws ec2 create-security-group \
+--description testsecgroup \
+--group-name $ASEC_GROUP \
+--vpc-id $VPC_ID
