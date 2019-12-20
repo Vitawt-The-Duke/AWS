@@ -26,7 +26,6 @@ IAM_POL_NAME="testcase"
 RDS_SNAP_ID="testcasesnap"
 COSRFILE="file://cors.json"
 POLICYFILE="file://policytestcasepol.json"
-NGINXPOLFILE="file://nginxpol.json"
 ASEC_GROUP="testsecgroup"
 ADMINHOMEIP="8.8.8.8/32"
 #******************************************************************************
@@ -312,15 +311,19 @@ aws ec2 authorize-security-group-ingress \
   --protocol tcp \
   --port 22 \
   -cidr $ADMINHOMEIP
-#allow nginx from wan
+#allow 2 nginx from wan
 aws ec2 authorize-security-group-ingress \
   --group-name $ASEC_GROUP \
   --protocol tcp \
   --port 80 \
   -cidr 0.0.0.0/0
-
-#CREATE EC2 image ubuntu-nginx
+#get network iface statuses
+#aws ec2 describe-network-interfaces --filters Name=vpc-id,Values=$VPC_ID --query "NetworkInterfaces[*].[NetworkInterfaceId,Description,VpcId,PrivateIpAddress]" --output table
+#
+#******************************************************************************
+#     Create instance for nginx
+#******************************************************************************
 #create and tag instance
-#aws ec2 run-instances --image-id ami-059d836af932792c3 --count 1 --instance-type t3.micro --key-name aws --subnet-id $SUBNET_PUBLIC_ID
-#get instances id
-#INSTANCE_AWS=$(aws ec2 describe-instances | jq -r ".Reservations[0].Instances[0].InstanceId")
+aws ec2 run-instances --image-id ami-059d836af932792c3 --count 1 --instance-type t3.micro --key-name aws --subnet-id $SUBNET_PUBLIC_ID
+#set instances id
+INSTANCE_AWS=$(aws ec2 describe-instances | jq -r ".Reservations[0].Instances[0].InstanceId")
