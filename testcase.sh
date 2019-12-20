@@ -282,6 +282,9 @@ echo "RDS database $RDS_DB_ID_CLONE restored from snapshot $RDS_SNAP_ID"
 #                                                       #
 #                                                       #
 read -n 1 -r -s -p $'"Press any key to continiune. It will remove all previously created RDS stuff"\n'
+aws rds stop-db-instance \
+  --db-instance-identifier $RDS_DB_ID \
+  --db-instance-identifier $RDS_DB_ID_CLONE \ 
 aws rds delete-db-snapshot \
   --db-snapshot-identifier $RDS_SNAP_ID
 aws rds delete-db-instance \
